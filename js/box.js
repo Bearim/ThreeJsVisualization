@@ -5,6 +5,7 @@ function buildBoxMesh(height, width, length) {
     var boxMaterial = new THREE.MeshLambertMaterial({color: 0x0ffff0, wireframe: true});
     var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
 
-    boxMesh.position.set(0, height, 0);
+    var x = 0, z = 0;
+    boxMesh.position.set(x, height, z);
     return boxMesh;
 }

@@ -11,9 +11,10 @@ function createTriangle(rightVector, leftVector, estrangementVector) {
 }
 
 function buildTriangleMesh(height, sideLength) {
-    var v1 = new THREE.Vector3(sideLength, 0, sideLength);
-    var v2 = new THREE.Vector3(-(sideLength * 2), 0, 0);
-    var v3 = new THREE.Vector3(sideLength, 0, -(sideLength));
+    var y = 0, z = 0;
+    var v1 = new THREE.Vector3(sideLength, y, sideLength);
+    var v2 = new THREE.Vector3(-(sideLength * 2), y, z);
+    var v3 = new THREE.Vector3(sideLength, y, -(sideLength));
 
     var firstTriangleMesh = createTriangle(v1, v2, v3);
     var secondTriangleMesh = createTriangle(v1, v3, v2);

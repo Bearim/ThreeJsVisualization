@@ -1,3 +1,21 @@
+function calculateFigureHeight(columnHeight, figureHeight) {
+    return figureHeight - columnHeight/2;
+}
+
+function buildCamera(towerParametersJson){
+    var towerParameters = JSON.parse(towerParametersJson);
+
+    var fieldOfView = 75;
+    var nearestPoint = 0.1;
+    var furthestPoint = 4000;
+    var camera = new THREE.PerspectiveCamera(fieldOfView, window.innerWidth / window.innerHeight, nearestPoint, furthestPoint);
+
+    camera.position.x = towerParameters.column.height/2 + 100;
+    camera.position.y = towerParameters.column.height/2 + 50;
+
+    return camera
+}
+
 function buildTowerScene(columnMesh, triangleMesh, boxMesh) {
     var scene = new THREE.Scene();
 
@@ -14,14 +32,34 @@ function buildTowerScene(columnMesh, triangleMesh, boxMesh) {
     return scene;
 }
 
-function buildTowerSceneFromJSON(parameters) {
-    var columnHeight = parameters.column.height;
-    var boxHeight = calculateFigureHeight(columnHeight, parameters.box.height);
-    var triangleHeight = calculateFigureHeight(columnHeight, parameters.triangle.height);
+function buildTowerSceneBasedOnParameters(towerParametersJson) {
+    var towerParameters = JSON.parse(towerParametersJson);
+    var columnHeight = towerParameters.column.height;
+    var boxHeight = calculateFigureHeight(columnHeight, towerParameters.box.height);
+    var triangleHeight = calculateFigureHeight(columnHeight, towerParameters.triangle.height);
 
-    var columnMesh = buildColumnMesh(columnHeight, parameters.column.radius);
-    var boxMesh = buildBoxMesh(boxHeight, parameters.box.width, parameters.box.length);
-    var triangleMesh = buildTriangleMesh(triangleHeight, parameters.triangle.sideLength);
+    var columnMesh = buildColumnMesh(columnHeight, towerParameters.column.radius);
+    var boxMesh = buildBoxMesh(boxHeight, towerParameters.box.width, towerParameters.box.length);
+    var triangleMesh = buildTriangleMesh(triangleHeight, towerParameters.triangle.sideLength);
 
     return buildTowerScene(columnMesh, triangleMesh, boxMesh);
+}
+
+function buildTower(towerParameters) {
+    var renderer = new THREE.WebGLRenderer();
+    var scene = buildTowerSceneBasedOnParameters(towerParameters);
+    var camera = buildCamera(towerParameters);
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    window.addEventListener('resize', function () {
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        renderer.setSize(width, height);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+    });
+
+    return {renderer: renderer, camera: camera, scene: scene};
 }

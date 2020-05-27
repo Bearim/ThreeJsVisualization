@@ -19,12 +19,7 @@
 <script src="js/box.js"></script>
 <script src="js/tower.js"></script>
 <script>
-    function calculateFigureHeight(columnHeight, figureHeight) {
-        return figureHeight - columnHeight/2;
-    }
-</script>
-<script>
-    var parameters = {
+    var towerParameters = {
         column: {
             height: 700,
             radius: 5
@@ -34,40 +29,22 @@
             sideLength: 60
         },
         box: {
-            height: 250,
+            height: 110,
             width: 100,
             length: 100
         }
     };
-    var json = JSON.stringify(parameters);
-    var parametersObject = JSON.parse(json);
+    var towerParametersJson = JSON.stringify(towerParameters);
 
-    var renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    var tower = buildTower(towerParametersJson);
 
-    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
-
-    camera.position.x = 400;
-    camera.position.y = 500;
-
-    var scene = buildTowerSceneFromJSON(parametersObject);
-
-    window.addEventListener('resize', function () {
-        var width = window.innerWidth;
-        var height = window.innerHeight;
-        renderer.setSize(width, height);
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-    });
-
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls = new THREE.OrbitControls(tower.camera, tower.renderer.domElement);
     controls.update();
 
     requestAnimationFrame(render);
 
     function render() {
-        renderer.render(scene, camera);
+        tower.renderer.render(tower.scene, tower.camera);
         requestAnimationFrame(render);
     }
 </script>
