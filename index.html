@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body{
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<script src="lib/three.js"></script>
+<script src="lib/OrbitControls.js"></script>
+<script>
+    function buildColumn(height, radius) {
+        var cylinderGeometry = new THREE.CylinderGeometry(radius, radius, height, 1300);
+        var cilynderMaterial = new THREE.MeshLambertMaterial({color: 0xffff00, wireframe: true});
+        return new THREE.Mesh(cylinderGeometry, cilynderMaterial);
+    }
+
+    function createTriangle(rightVector, leftVector, estrangementVector) {
+        var triangleGeometry = new THREE.Geometry();
+        triangleGeometry.vertices.push(rightVector);
+        triangleGeometry.vertices.push(leftVector);
+        triangleGeometry.vertices.push(estrangementVector);
+
+        triangleGeometry.faces.push(new THREE.Face3(0, 1, 2));
+        triangleGeometry.computeFaceNormals();
+
+        return new THREE.Mesh(triangleGeometry, new THREE.MeshNormalMaterial());
+    }
+
+    function buildTriangle(height) {
+        var v1 = new THREE.Vector3(30, 30, 30);
+        var v2 = new THREE.Vector3(-60, 30, 0);
+        var v3 = new THREE.Vector3(30, 30, -30);
+
+        var firstTriangleMesh = createTriangle(v1, v2, v3);
+        var secondTriangleMesh = createTriangle(v1, v3, v2);
+
+        var singleGeometry = new THREE.Geometry();
+
+        firstTriangleMesh.updateMatrix();
+        singleGeometry.merge(firstTriangleMesh.geometry, firstTriangleMesh.matrix);
+
+        secondTriangleMesh.updateMatrix();
+        singleGeometry.merge(secondTriangleMesh.geometry, secondTriangleMesh.matrix);
+
+        var triangleMesh = new THREE.Mesh(singleGeometry, new THREE.MeshNormalMaterial());
+        triangleMesh.position.set(0, height, 0);
+        return triangleMesh;
+    }
+</script>
+<script>
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
+
+    var scene = new THREE.Scene();
+
+    var light = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(light);
+
+    var additionalLight = new THREE.PointLight(0xffffff, 0.5);
+    scene.add(additionalLight);
+
+    window.addEventListener('resize', function () {
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        renderer.setSize(width, height);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+    });
+
+    var cilinderMesh = buildColumn(700, 5);
+
+    scene.add(cilinderMesh);
+
+    camera.position.x = 400;
+    camera.position.y = 500;
+
+    var boxGeometry = new THREE.BoxBufferGeometry(100, 10, 100, 70, 70, 70);
+    var boxMaterial = new THREE.MeshLambertMaterial({color: 0x0ffff0, wireframe: true});
+    var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+
+    boxMesh.position.set(0, -100, 0);
+    scene.add(boxMesh);
+
+    var triangleMesh = buildTriangle(100);
+
+    scene.add(triangleMesh);
+
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    controls.update();
+
+
+    requestAnimationFrame(render);
+    function render() {
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+    }
+</script>
+</body>
+</html>
